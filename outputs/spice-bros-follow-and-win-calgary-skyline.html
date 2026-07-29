@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+<title>Spice Bros — Follow & Win</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;500;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #1e1512;
+    --chili: #e8482a;
+    --chili-dark: #c13a1f;
+    --turmeric: #f2a93b;
+    --turmeric-dark: #c98a1f;
+    --cream: #f5ede1;
+    --cream-dim: #c9bba8;
+    --line: rgba(245,237,225,0.14);
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--cream);
+    font-family: 'DM Sans', sans-serif;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    padding: 32px 16px 60px;
+    position: relative;
+    isolation: isolate;
+    overflow-x: hidden;
+  }
+  .page { width: 100%; max-width: 420px; position: relative; z-index: 1; }
+  .calgary-skyline {
+    position: fixed;
+    z-index: -1;
+    right: 50%;
+    bottom: 0;
+    width: max(860px, 100vw);
+    min-width: 860px;
+    height: auto;
+    transform: translateX(50%);
+    color: var(--chili);
+    opacity: 0.20;
+    pointer-events: none;
+    user-select: none;
+  }
+  .calgary-skyline .sky-glow { fill: var(--turmeric); opacity: .38; }
+  .calgary-skyline .mountain-line { fill: none; stroke: var(--cream-dim); stroke-width: 2; opacity: .44; }
+  .calgary-skyline .mountain-line.near { opacity: .25; }
+  .calgary-skyline .river-line { fill: none; stroke: var(--turmeric); stroke-width: 2; opacity: .65; }
+  .calgary-skyline .building-line { fill: none; stroke: var(--cream); stroke-width: 2; opacity: .75; }
+  .calgary-skyline .window { fill: var(--turmeric); opacity: .75; }
+  .calgary-skyline .ground-line { stroke: var(--cream); stroke-width: 2; opacity: .35; }
+  .calgary-skyline .logo-slot { fill: var(--bg); stroke: var(--turmeric); stroke-width: 2; opacity: .75; }
+  .calgary-skyline .logo-name { fill: var(--cream); font-family: 'Bebas Neue', sans-serif; font-size: 28px; letter-spacing: 3px; opacity: .9; }
+  .calgary-skyline .logo-caption { fill: var(--turmeric); font-family: 'DM Mono', monospace; font-size: 8px; letter-spacing: 2px; opacity: .9; }
+  .calgary-skyline .food-line { fill: none; stroke: var(--turmeric); stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; opacity: .82; }
+  .calgary-skyline .food-fill { fill: var(--chili); opacity: .65; }
+  @media (prefers-reduced-motion: reduce) {
+    .calgary-skyline { transform: translateX(50%); }
+  }
+  .logo-picture-slot {
+    width: min(248px, 78vw);
+    min-height: 104px;
+    margin: 0 auto 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+    border: 2px dashed rgba(242,169,59,0.72);
+    border-radius: 18px;
+    background: rgba(30,21,18,0.76);
+    box-shadow: 0 18px 40px rgba(0,0,0,0.22), inset 0 0 0 1px rgba(245,237,225,0.08);
+    overflow: hidden;
+  }
+  .logo-picture-slot img {
+    display: block;
+    max-width: 100%;
+    max-height: 84px;
+    width: auto;
+    height: auto;
+    object-fit: contain;
+  }
+  .logo-placeholder {
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 0.14em;
+    color: var(--turmeric);
+    text-transform: uppercase;
+    text-align: center;
+  }
+  .eyebrow {
+    display:flex; align-items:center; gap:8px;
+    font-family:'DM Mono', monospace; font-size:12px; letter-spacing:0.12em;
+    color: var(--turmeric); text-transform:uppercase; margin-bottom:14px;
+  }
+  h1 {
+    font-family:'Bebas Neue', sans-serif;
+    font-size:clamp(40px, 14vw, 56px); line-height:0.95; letter-spacing:0.01em;
+    margin:0 0 12px; color:var(--cream);
+  }
+  .sub { font-size:15px; line-height:1.5; color:var(--cream-dim); margin:0 0 28px; }
+  .btn {
+    display:flex; align-items:center; justify-content:center; gap:10px;
+    width:100%; padding:18px; border:none; border-radius:14px;
+    font-family:'DM Sans',sans-serif; font-weight:700; font-size:17px;
+    cursor:pointer; transition:background .15s, transform .1s, opacity .3s;
+    text-decoration:none; box-sizing:border-box;
+  }
+  .btn:active { transform: scale(0.98); }
+  .btn-follow { background: var(--chili); color:#fff; }
+  .btn-follow:hover { background: var(--chili-dark); }
+  .btn-enter { background: var(--turmeric); color:#2a1a08; }
+  .btn-enter:hover { background: var(--turmeric-dark); }
+  .hint { text-align:center; font-size:13px; color:var(--cream-dim); margin-top:10px; }
+
+  .divider { position:relative; height:0; margin:32px 0; border-top:2px dashed var(--line); }
+  .divider::before, .divider::after {
+    content:''; position:absolute; top:-9px; width:18px; height:18px; border-radius:50%;
+    background: var(--bg);
+  }
+  .divider::before { left:-9px; }
+  .divider::after { right:-9px; }
+
+  .enter-wrap.locked .btn-enter { display:none; }
+  .enter-wrap:not(.locked) .unlock-hint { display:none; }
+  .unlock-hint { font-size:13px; color:var(--cream-dim); text-align:center; padding:18px 0; margin:0; }
+
+  .footnote { text-align:center; font-size:12px; color:var(--cream-dim); margin-top:12px; }
+  .fine-print { margin-top:30px; font-size:11px; line-height:1.6; color:#7a6a5c; text-align:center; }
+</style>
+</head>
+<body>
+<!-- Decorative inline SVG based on the supplied Calgary skyline reference; no external requests, scripts, or tracking. -->
+<svg class="calgary-skyline" viewBox="0 0 1440 360" role="img" aria-label="Decorative Calgary skyline silhouette" focusable="false">
+  <circle class="sky-glow" cx="1140" cy="82" r="68"/>
+  <!-- Replaceable wordmark space: swap this group for the final supplied logo when available. -->
+  <g aria-label="Spice Bros logo space">
+    <rect class="logo-slot" x="603" y="22" width="234" height="50" rx="25"/>
+    <text class="logo-name" x="720" y="51" text-anchor="middle">SPICE BROS</text>
+    <text class="logo-caption" x="720" y="64" text-anchor="middle">CALGARY · ALBERTA</text>
+  </g>
+  <!-- Food motifs kept as simple vectors: peppers, herb sprig, and spice sparkle. -->
+  <g aria-hidden="true">
+    <path class="food-fill" d="M137 118c-23 3-39 25-33 46 7 24 37 29 53 6 14-21 8-50-5-64-2 8-7 11-15 12z"/>
+    <path class="food-line" d="M139 118c-2-12 4-20 15-24m-17 24c-23 3-39 25-33 46 7 24 37 29 53 6 14-21 8-50-5-64"/>
+    <path class="food-line" d="M1240 120c16-15 35-15 51-1m-25 1c-10 20-8 37 9 53m-21-53c-7 18-22 30-40 36m62-37c8 20 22 32 40 38"/>
+    <path class="food-line" d="M1233 145c16 0 31 6 44 18m-20-44c9 11 15 25 16 40"/>
+    <path class="food-line" d="M1338 97v20m-10-10h20m-17-17 14 14m0-14-14 14"/>
+  </g>
+  <!-- Faint Rockies, echoing the supplied SkylineCanvas treatment. -->
+  <path class="mountain-line" d="M0 196 62 172l50 18 58-55 54 43 65-72 73 61 70-39 73 47 61-90 78 76 68-45 69 52 80-78 80 69 67-35 62 43 64-64 75 59 78-40 73 52 67-61 70 59 75-39 77 42"/>
+  <path class="mountain-line near" d="M0 231 82 205l73 25 80-38 67 30 74-44 91 50 74-30 83 39 82-59 88 58 72-32 79 43 88-54 75 52 75-27 82 40 86-49 83 47 80-31 79 33"/>
+  <!-- Wireframe downtown buildings. -->
+  <g class="building-line">
+    <rect x="52" y="239" width="66" height="70"/>
+    <rect x="126" y="201" width="74" height="108"/>
+    <rect x="209" y="246" width="56" height="63"/>
+    <rect x="327" y="184" width="80" height="125"/>
+    <rect x="416" y="222" width="61" height="87"/>
+    <rect x="486" y="157" width="93" height="152"/>
+    <rect x="590" y="211" width="75" height="98"/>
+    <rect x="676" y="237" width="56" height="72"/>
+    <rect x="742" y="182" width="88" height="127"/>
+    <rect x="840" y="218" width="66" height="91"/>
+    <path d="M928 309V161c0-42 34-76 76-76h50v224m-67 0V137c0-20 16-36 36-36h31"/>
+    <rect x="1064" y="205" width="78" height="104"/>
+    <rect x="1152" y="234" width="55" height="75"/>
+    <rect x="1217" y="174" width="90" height="135"/>
+    <rect x="1317" y="229" width="69" height="80"/>
+  </g>
+  <!-- Calgary Tower -->
+  <g class="building-line">
+    <path d="M280 309h14l-5-95h-4l7-20 7 20h-4l-5 95h14"/>
+    <path d="M270 197h44l-5 15h-34z"/>
+    <path d="M292 197v-37"/>
+  </g>
+  <!-- A small, fixed selection of warm windows. -->
+  <g class="window">
+    <rect x="141" y="217" width="8" height="10"/><rect x="165" y="241" width="8" height="10"/><rect x="181" y="217" width="8" height="10"/>
+    <rect x="343" y="201" width="9" height="11"/><rect x="373" y="224" width="9" height="11"/><rect x="343" y="248" width="9" height="11"/>
+    <rect x="504" y="177" width="10" height="12"/><rect x="540" y="202" width="10" height="12"/><rect x="522" y="239" width="10" height="12"/>
+    <rect x="759" y="201" width="9" height="11"/><rect x="797" y="226" width="9" height="11"/><rect x="778" y="263" width="9" height="11"/>
+    <rect x="1090" y="224" width="9" height="11"/><rect x="1117" y="251" width="9" height="11"/>
+    <rect x="1235" y="195" width="10" height="12"/><rect x="1271" y="220" width="10" height="12"/><rect x="1253" y="259" width="10" height="12"/>
+  </g>
+  <!-- Bow River trace and ground elevation line. -->
+  <path class="river-line" d="M0 331c98-16 183 15 271-1s157-20 257-4 181 22 280 3 190-23 286-5 178 22 346-3"/>
+  <path class="ground-line" d="M0 309.5h1440"/>
+</svg>
+<div class="page">
+  <div class="logo-picture-slot" aria-label="Spice Bros Logo">
+    <img src="C:\Users\acer\Documents\Codex\2026-07-29\plugin-creator-c-users-acer-codex\spicebroslogo.png" alt="Spice Bros Logo"> 
+</div>
+  <div class="eyebrow">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M12 2C9 6 6 9 6 13a6 6 0 0012 0c0-2-1-3.5-2.5-5" stroke="#f2a93b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    Spice Bros · Calgary
+  </div>
+  <h1>SCAN.<br>FOLLOW.<br>WIN.</h1>
+  <p class="sub">Follow us on Instagram, then enter this week's giveaway. Winner picked every Friday.</p>
+
+  <button class="btn btn-follow" id="followBtn">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="white"/></svg>
+    Follow @spicebrosyyc
+  </button>
+  <p class="hint" id="followHint">Tap follow, then enter your details below</p>
+
+  <div class="divider"></div>
+
+  <div class="enter-wrap locked" id="enterWrap">
+    <p class="unlock-hint">Follow us above to unlock entry ↑</p>
+    <a class="btn btn-enter" id="enterBtn" href="#" target="_blank" rel="noopener noreferrer">Enter the draw →</a>
+    <p class="footnote">Takes about 30 seconds · winners featured on our story every Friday</p>
+  </div>
+
+  <p class="fine-print">No purchase necessary. One entry per person. Odds depend on total entries. Full rules in @spicebrosyyc bio.</p>
+</div>
+
+<script>
+// Paste your live Google Form link here once you've created it (see chat for setup steps)
+const GOOGLE_FORM_URL = 'https://forms.gle/PASTE_YOUR_FORM_LINK_HERE';
+const IG_URL = 'https://instagram.com/spicebrosyyc';
+
+document.getElementById('enterBtn').href = GOOGLE_FORM_URL;
+
+document.getElementById('followBtn').addEventListener('click', () => {
+  // Explicitly prevent the new tab from accessing this page via window.opener.
+  const instagramTab = window.open(IG_URL, '_blank', 'noopener,noreferrer');
+  if (instagramTab) instagramTab.opener = null;
+  document.getElementById('enterWrap').classList.remove('locked');
+  document.getElementById('followHint').textContent = "Nice — now enter your details below";
+});
+</script>
+</body>
+</html>
